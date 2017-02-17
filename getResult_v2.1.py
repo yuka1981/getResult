@@ -222,14 +222,15 @@ def get_dirs_list(current_work_directory):
 
             os.chdir('../')
         else:
-            print('The Report.html file does not exist in ' + str(directories))
+            pass
+            #print('The Report.html file does not exist in ' + str(directories))
 
+    #print(directories)
     return directories
 
 def write_title(summary_html_file):
     ''' 在 CSV 檔案裡寫入標題列
     '''
-    fw = open('../../output.csv', 'a', encoding='utf-8')
     data_list = summary(summary_html_file)
     
     # 取出 keys 並加至 title name list 裡
@@ -277,11 +278,15 @@ def write_title(summary_html_file):
     combind_title_name_list = title_front_list + title_name_list + title_behind_list + transcation_name_list
     #print(combind_title_name_list[-1])
 
-    for i in range(len(combind_title_name_list)):
-        if i == len(combind_title_name_list)-1:
-            fw.write(combind_title_name_list[i] + '\n')
-        else:
-            fw.write(combind_title_name_list[i] + ',')  
+    if os.path.isfile('../../output.csv') == True:
+        pass
+    else:
+        fw = open('../../output.csv', 'a', encoding='utf-8')
+        for i in range(len(combind_title_name_list)):
+            if i == len(combind_title_name_list)-1:
+                fw.write(combind_title_name_list[i] + '\n')
+            else:
+                fw.write(combind_title_name_list[i] + ',')  
 
     #for item in combind_title_name_list:
     #    if item == combind_title_name_list[-1]:
@@ -289,7 +294,8 @@ def write_title(summary_html_file):
     #    else:
     #        fw.write(item + ',')  
     
-    fw.close()
+        fw.close()
+    
     return title_name_list, transcation_name_list_sorted
 
 def get_report_data(report_dir):
@@ -341,20 +347,28 @@ def get_report_data(report_dir):
     duration_time_data = duration_time('summary.html')       
     
     # 開啟 csv 檔
-    fw = open('../../output.csv', 'a', encoding='utf=8')
-    fw.write(str(report_dir) + ',')
+    #fw = open('../../output.csv', 'a', encoding='utf=8')
+    #fw.write(str(report_dir) + ',')
 
-    for item in scenario_time_data:
-        fw.write(item + ',')
+    #for item in scenario_time_data:
+    #    fw.write(item + ',')
 
-    fw.write(str(virtual_users) + ',' + str(duration_time_data) + ',')
+    #fw.write(str(virtual_users) + ',' + str(duration_time_data) + ',')
 
     # 取得 time to first buffer breakdown (over time) data
     net_time_data, srv_time_data = get_time_to_first_buff(report_index.get('Time to First Buffer Breakdown (Over Time)'))
     
     # 取出 summary 所需的數據
     csv_data = []
-    
+
+    csv_data.append(str(report_dir))
+
+    for item in scenario_time_data:
+        csv_data.append(item)
+
+    csv_data.append(str(virtual_users))
+    csv_data.append(str(duration_time_data))
+
     #title_name_list = write_title('summary.html')
     #title_name_list.remove('Std. Dev')
 
@@ -413,6 +427,8 @@ def get_report_data(report_dir):
             csv_data.append(summary_data[Transaction][item])
     
     # 將取出的數據寫入 csv 檔
+
+    fw = open('../../output.csv', 'a', encoding='utf=8')
     for i in range(len(csv_data)):
         if i == len(csv_data) - 1 :
             fw.write(str(csv_data[i]) + '\n')
